@@ -2,929 +2,684 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Sticker Design Configurator</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;800&display=swap');
+:root{
+  --bg:#0d0d14;--bg2:#13131e;--bg3:#1c1c2b;--border:#262636;
+  --acc:#7c6dff;--acc2:#ff6d9d;--grn:#4dffb4;
+  --txt:#e8e6ff;--txt2:#7a78a0;--txt3:#3a3858;
+  --sel:rgba(124,109,255,.15);--logo:rgba(77,255,180,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
 
-  :root {
-    --bg:    #0a0a0f;
-    --bg2:   #111118;
-    --bg3:   #1a1a24;
-    --border:#2a2a3a;
-    --acc:   #7c6dff;
-    --acc2:  #ff6d9d;
-    --grn:   #4dffb4;
-    --txt:   #e8e6ff;
-    --txt2:  #7a78a0;
-    --txt3:  #3d3b5c;
-    --sel:   rgba(124,109,255,0.18);
-    --logo:  rgba(77,255,180,0.15);
-  }
+/* TOP BAR */
+header{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:100}
+.brand{font-size:14px;font-weight:700;background:linear-gradient(120deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.badge{font-size:10px;color:var(--txt2);border:1px solid var(--border);border-radius:4px;padding:2px 8px}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* LAYOUT */
+.workspace{display:grid;grid-template-columns:280px 1fr 260px;height:calc(100vh - 52px)}
 
-  body {
-    font-family: 'JetBrains Mono', monospace;
-    background: var(--bg);
-    color: var(--txt);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+/* PANELS */
+.panel{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.panel.right{border-right:none;border-left:1px solid var(--border)}
+.panel-hdr{padding:12px 14px;font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--txt2);text-transform:uppercase;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2)}
 
-  /* ── TOP BAR ── */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 28px;
-    height: 56px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg2);
-    position: sticky; top: 0; z-index: 100;
-  }
-  .logo-mark {
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: .04em;
-    background: linear-gradient(120deg, var(--acc), var(--acc2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .badge { font-size: 10px; color: var(--txt2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; }
+/* UPLOAD */
+#drop-zone{margin:14px;border:2px dashed var(--border);border-radius:10px;padding:24px 12px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3);flex-shrink:0}
+#drop-zone:hover,#drop-zone.drag{border-color:var(--acc);background:var(--sel)}
+#drop-zone .icon{font-size:26px;margin-bottom:6px}
+#drop-zone p{font-size:11px;color:var(--txt2);line-height:1.6}
+#drop-zone strong{color:var(--txt);display:block}
+#file-inp{display:none}
 
-  /* ── LAYOUT ── */
-  .workspace {
-    display: grid;
-    grid-template-columns: 300px 1fr 280px;
-    height: calc(100vh - 56px);
-  }
+/* LAYER TREE */
+#layer-tree{flex:1;overflow-y:auto;padding:6px 0}
+.tree-empty{padding:20px 14px;font-size:11px;color:var(--txt3);text-align:center;line-height:1.7}
+.tree-section-label{font-size:9px;color:var(--txt3);padding:8px 14px 4px;letter-spacing:.1em;text-transform:uppercase}
 
-  /* ── PANELS ── */
-  .panel {
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-  .panel:last-child { border-right: none; border-left: 1px solid var(--border); }
-  .panel-header {
-    padding: 14px 16px 10px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: .12em;
-    color: var(--txt2);
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-    position: sticky; top: 0;
-    background: var(--bg2);
-    z-index: 10;
-  }
+.layer-row{display:flex;align-items:center;gap:5px;padding:5px 10px;cursor:pointer;border-radius:6px;margin:1px 5px;font-size:11px;transition:background .1s;position:relative}
+.layer-row:hover{background:var(--bg3)}
+.layer-row.is-logo{background:var(--logo)}
+.layer-row.is-logo::before{content:'';position:absolute;left:0;top:2px;bottom:2px;width:3px;background:var(--grn);border-radius:0 2px 2px 0}
+.l-arrow{width:12px;font-size:8px;color:var(--txt3);transition:transform .15s;flex-shrink:0;text-align:center}
+.l-arrow.open{transform:rotate(90deg);color:var(--txt2)}
+.l-type{width:16px;text-align:center;font-size:11px;flex-shrink:0}
+.l-nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.l-nm.dim{color:var(--txt3);font-style:italic}
+.l-badge{font-size:9px;background:var(--grn);color:#000;border-radius:3px;padding:1px 5px;font-weight:700;flex-shrink:0}
+.l-children{padding-left:12px;display:none}
+.l-children.open{display:block}
 
-  /* ── UPLOAD ZONE ── */
-  #upload-zone {
-    margin: 16px;
-    border: 2px dashed var(--border);
-    border-radius: 12px;
-    padding: 28px 16px;
-    text-align: center;
-    cursor: pointer;
-    transition: all .2s;
-    background: var(--bg3);
-  }
-  #upload-zone:hover, #upload-zone.drag { border-color: var(--acc); background: var(--sel); }
-  #upload-zone .icon { font-size: 28px; margin-bottom: 8px; }
-  #upload-zone p { font-size: 11px; color: var(--txt2); line-height: 1.5; }
-  #upload-zone strong { color: var(--txt); }
-  #file-inp { display: none; }
+/* PREVIEW CENTER */
+.preview-area{background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;position:relative}
+.preview-screen{width:300px;height:300px;background:#111;border-radius:20px;overflow:hidden;border:1px solid var(--border);box-shadow:0 0 50px rgba(124,109,255,.07);position:relative;display:flex;align-items:center;justify-content:center}
+#lottie-wrap{width:100%;height:100%}
+.preview-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;pointer-events:none}
+#loading-msg{font-size:11px;color:var(--txt2)}
+#error-msg{font-size:11px;color:var(--acc2);text-align:center;padding:0 16px;display:none}
 
-  /* ── LAYER TREE ── */
-  #layer-tree { padding: 8px 0; }
-  .tree-empty { padding: 20px 16px; font-size: 11px; color: var(--txt3); text-align: center; line-height: 1.6; }
+.toolbar{display:flex;gap:6px}
+.tb{padding:6px 12px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--txt2);font:11px/1 inherit;cursor:pointer;transition:all .15s}
+.tb:hover{border-color:var(--acc);color:var(--txt)}
+.tb.on{background:var(--sel);border-color:var(--acc);color:var(--acc)}
 
-  .layer-node { user-select: none; }
-  .layer-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 12px;
-    cursor: pointer;
-    border-radius: 6px;
-    margin: 1px 6px;
-    font-size: 11px;
-    transition: background .12s;
-    position: relative;
-  }
-  .layer-row:hover { background: var(--bg3); }
-  .layer-row.selected { background: var(--sel); }
-  .layer-row.is-logo { background: var(--logo); }
-  .layer-row.is-logo::before {
-    content: '';
-    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-    background: var(--grn);
-    border-radius: 0 3px 3px 0;
-  }
+.sel-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:300px}
+.sel-badge{font-size:10px;padding:3px 8px;border-radius:4px;background:var(--logo);border:1px solid var(--grn);color:var(--grn)}
 
-  .layer-toggle {
-    width: 14px; height: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 8px; color: var(--txt3);
-    transition: transform .15s;
-    flex-shrink: 0;
-  }
-  .layer-toggle.open { transform: rotate(90deg); color: var(--txt2); }
-  .layer-toggle.leaf { color: var(--txt3); }
-  .layer-type { font-size: 10px; flex-shrink: 0; width: 18px; text-align: center; }
-  .layer-nm { flex: 1; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; }
-  .layer-nm.unnamed { color: var(--txt3); font-style: italic; }
-  .layer-logo-badge {
-    font-size: 9px; background: var(--grn); color: #000;
-    border-radius: 3px; padding: 1px 5px; font-weight: 700;
-    flex-shrink: 0;
-  }
+.hint{font-size:11px;color:var(--txt3);text-align:center;line-height:1.6}
 
-  .layer-children { padding-left: 14px; display: none; }
-  .layer-children.open { display: block; }
+/* RIGHT CONFIG */
+.cfg-sec{padding:12px 14px;border-bottom:1px solid var(--border)}
+.cfg-lbl{display:block;font-size:9px;color:var(--txt2);margin-bottom:6px;letter-spacing:.07em;text-transform:uppercase}
+.cfg-sub{font-size:9px;color:var(--txt3)}
+.stat-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
+.stat-val{color:var(--acc);font-weight:700}
 
-  /* ── CENTER PREVIEW ── */
-  .preview-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg);
-    gap: 16px;
-    padding: 24px;
-    position: relative;
-  }
+/* LOGO LIST */
+.logo-list{display:flex;flex-direction:column;gap:4px}
+.logo-item{display:flex;align-items:center;gap:7px;background:var(--logo);border:1px solid var(--grn);border-radius:6px;padding:6px 8px;font-size:10px;color:var(--grn)}
+.logo-rm{margin-left:auto;cursor:pointer;color:var(--acc2);opacity:.7;font-size:12px}
+.logo-rm:hover{opacity:1}
+.logo-empty{font-size:11px;color:var(--txt3);text-align:center;padding:10px 0;line-height:1.6}
 
-  .preview-screen {
-    width: 320px; height: 320px;
-    background: #111;
-    border-radius: 24px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    position: relative;
-    box-shadow: 0 0 60px rgba(124,109,255,0.08);
-  }
-  #lottie-preview { width: 100%; height: 100%; }
+/* COLORS */
+.color-row{display:flex;align-items:center;gap:8px}
+.cprev{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);cursor:pointer;flex-shrink:0;transition:transform .1s}
+.cprev:hover{transform:scale(1.1)}
+.chex{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--txt);font:12px/1 inherit;padding:6px 9px;border-radius:7px;outline:none}
+.chex:focus{border-color:var(--acc)}
+input[type=color]{display:none}
+.swatches{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.swatch{width:22px;height:22px;border-radius:5px;cursor:pointer;border:2px solid transparent;transition:all .12s;position:relative}
+.swatch:hover{transform:scale(1.15)}
+.swatch.as-primary{border-color:var(--acc)!important}
+.swatch.as-secondary{border-color:var(--acc2)!important}
+.swatch-tip{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border);font-size:9px;padding:3px 6px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s;color:var(--txt);z-index:10}
+.swatch:hover .swatch-tip{opacity:1}
 
-  .preview-hint {
-    font-size: 11px;
-    color: var(--txt3);
-    text-align: center;
-    line-height: 1.6;
-  }
+/* EXPORT */
+.info{margin:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:10px;line-height:1.7;color:var(--txt2)}
+.info b{color:var(--txt)}
+.export-status{margin:0 14px 8px;font-size:11px;color:var(--grn);text-align:center;min-height:16px}
+.export-btn{margin:0 14px 16px;width:calc(100% - 28px);padding:12px;background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;border-radius:10px;color:#fff;font:700 13px/1 inherit;cursor:pointer;transition:all .15s;letter-spacing:.02em}
+.export-btn:hover{opacity:.9;transform:translateY(-1px)}
+.export-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
 
-  .preview-toolbar {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-  .tb-btn {
-    padding: 6px 12px;
-    border-radius: 7px;
-    border: 1px solid var(--border);
-    background: var(--bg3);
-    color: var(--txt2);
-    font-family: inherit;
-    font-size: 11px;
-    cursor: pointer;
-    transition: all .15s;
-  }
-  .tb-btn:hover { border-color: var(--acc); color: var(--txt); }
-  .tb-btn.active { background: var(--sel); border-color: var(--acc); color: var(--acc); }
+/* TOAST */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--bg3);border:1px solid var(--border);padding:9px 18px;border-radius:8px;font-size:12px;transition:transform .22s;z-index:999;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
 
-  .logo-badge-row {
-    display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
-    max-width: 320px;
-  }
-  .logo-badge {
-    font-size: 10px; padding: 3px 8px; border-radius: 4px;
-    background: var(--logo); border: 1px solid var(--grn);
-    color: var(--grn);
-  }
-
-  /* ── RIGHT PANEL ── */
-  .config-section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
-  .config-section label { display: block; font-size: 10px; color: var(--txt2); margin-bottom: 6px; letter-spacing: .06em; text-transform: uppercase; }
-
-  .color-row { display: flex; align-items: center; gap: 8px; }
-  .color-preview {
-    width: 28px; height: 28px; border-radius: 6px;
-    border: 1px solid var(--border);
-    cursor: pointer; flex-shrink: 0;
-    transition: transform .1s;
-  }
-  .color-preview:hover { transform: scale(1.1); }
-  .color-hex {
-    flex: 1;
-    background: var(--bg3); border: 1px solid var(--border);
-    color: var(--txt); font-family: inherit; font-size: 12px;
-    padding: 6px 10px; border-radius: 7px;
-    outline: none;
-    transition: border-color .15s;
-  }
-  .color-hex:focus { border-color: var(--acc); }
-  input[type="color"] { display: none; }
-
-  .detected-colors { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-  .det-color {
-    width: 24px; height: 24px; border-radius: 5px;
-    cursor: pointer; border: 2px solid transparent;
-    transition: all .12s;
-    position: relative;
-  }
-  .det-color:hover { border-color: #fff4; transform: scale(1.15); }
-  .det-color.set-primary { border-color: var(--acc); }
-  .det-color.set-secondary { border-color: var(--acc2); }
-  .det-color-tip {
-    position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
-    background: var(--bg); border: 1px solid var(--border);
-    font-size: 9px; padding: 3px 6px; border-radius: 4px;
-    white-space: nowrap; pointer-events: none;
-    opacity: 0; transition: opacity .15s;
-  }
-  .det-color:hover .det-color-tip { opacity: 1; }
-
-  /* info box */
-  .info-box {
-    margin: 12px 16px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 10px;
-    line-height: 1.6;
-    color: var(--txt2);
-  }
-  .info-box b { color: var(--txt); }
-
-  /* stats */
-  .stat-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 11px; }
-  .stat-val { color: var(--acc); font-weight: 700; }
-
-  /* logo layers list */
-  .logo-list { display: flex; flex-direction: column; gap: 4px; }
-  .logo-item {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--logo); border: 1px solid var(--grn);
-    border-radius: 6px; padding: 6px 8px; font-size: 10px; color: var(--grn);
-  }
-  .logo-item .remove-btn {
-    margin-left: auto; cursor: pointer; opacity: .6; font-size: 12px; color: var(--acc2);
-    transition: opacity .12s;
-  }
-  .logo-item .remove-btn:hover { opacity: 1; }
-  .logo-empty { font-size: 11px; color: var(--txt3); text-align: center; padding: 12px 0; }
-
-  /* export button */
-  .export-btn {
-    margin: 16px;
-    width: calc(100% - 32px);
-    padding: 12px;
-    background: linear-gradient(135deg, var(--acc), var(--acc2));
-    border: none;
-    border-radius: 10px;
-    color: #fff;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .15s;
-    letter-spacing: .02em;
-  }
-  .export-btn:hover { opacity: .9; transform: translateY(-1px); }
-  .export-btn:disabled { opacity: .3; cursor: not-allowed; transform: none; }
-
-  .export-status {
-    margin: 0 16px 12px;
-    font-size: 11px;
-    color: var(--grn);
-    text-align: center;
-    min-height: 16px;
-  }
-
-  /* scrollbar */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-  /* toast */
-  #toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px);
-    background: var(--bg3); border: 1px solid var(--border);
-    padding: 10px 20px; border-radius: 8px;
-    font-size: 12px; color: var(--txt);
-    transition: transform .25s ease;
-    z-index: 999;
-  }
-  #toast.show { transform: translateX(-50%) translateY(0); }
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo-mark">✦ Design Configurator</div>
+  <div class="brand">✦ Design Configurator</div>
   <div class="badge">Magic Sticker Bot — Owner Tool</div>
 </header>
 
 <div class="workspace">
 
-  <!-- ── LEFT: LAYER TREE ── -->
-  <div class="panel">
-    <div class="panel-header">Layer Tree</div>
+<!-- ── LEFT: LAYER TREE ─────────────────────────────────────── -->
+<div class="panel">
+  <div class="panel-hdr">Layers</div>
 
-    <div id="upload-zone" onclick="document.getElementById('file-inp').click()"
-         ondragover="e=>{e.preventDefault();this.classList.add('drag')}"
-         ondragleave="this.classList.remove('drag')"
-         ondrop="handleDrop(event)">
-      <div class="icon">📁</div>
-      <p><strong>Drop Lottie JSON here</strong><br>or click to browse</p>
-      <input type="file" id="file-inp" accept=".json" onchange="loadFile(this.files[0])">
-    </div>
+  <div id="drop-zone"
+       onclick="document.getElementById('file-inp').click()"
+       ondragover="event.preventDefault();this.classList.add('drag')"
+       ondragleave="this.classList.remove('drag')"
+       ondrop="onDrop(event)">
+    <div class="icon">📂</div>
+    <p><strong>Drop Lottie JSON here</strong>or click to select file</p>
+    <input type="file" id="file-inp" accept=".json" onchange="loadFile(this.files[0])">
+  </div>
 
-    <div id="layer-tree">
-      <div class="tree-empty">Load a Lottie JSON file to<br>see the layer tree here.</div>
+  <div id="layer-tree">
+    <div class="tree-empty">Load a Lottie JSON to<br>see all layers here.</div>
+  </div>
+</div>
+
+<!-- ── CENTER: PREVIEW ─────────────────────────────────────── -->
+<div class="preview-area">
+  <div class="preview-screen">
+    <div id="lottie-wrap"></div>
+    <div class="preview-overlay">
+      <div id="loading-msg">Load a JSON file to preview</div>
+      <div id="error-msg">⚠️ Preview error.<br>Check browser console.</div>
     </div>
   </div>
 
-  <!-- ── CENTER: PREVIEW ── -->
-  <div class="preview-area">
-    <div class="preview-screen">
-      <div id="lottie-preview"></div>
-    </div>
+  <div class="toolbar">
+    <button class="tb on" id="tb-full"   onclick="setMode('full')">▶ Full</button>
+    <button class="tb"    id="tb-logo"   onclick="setMode('logo')">Logo Only</button>
+    <button class="tb"    id="tb-colors" onclick="setMode('colors')">With Colors</button>
+  </div>
 
-    <div class="preview-toolbar">
-      <button class="tb-btn active" id="btn-full" onclick="togglePreview('full')">▶ Full</button>
-      <button class="tb-btn" id="btn-logo-only" onclick="togglePreview('logo')">Logo Layer Only</button>
-      <button class="tb-btn" id="btn-colors" onclick="togglePreview('colors')">With Colors</button>
-    </div>
+  <div class="sel-badges" id="sel-badges"></div>
+  <div class="hint" id="hint">Click any layer to mark it as the logo layer.</div>
+</div>
 
-    <div class="logo-badge-row" id="logo-badge-row"></div>
+<!-- ── RIGHT: CONFIG ────────────────────────────────────────── -->
+<div class="panel right">
+  <div class="panel-hdr">Configuration</div>
 
-    <div class="preview-hint" id="preview-hint">
-      Load a JSON file, then click layers to<br>mark them as logo layers.
+  <div class="cfg-sec">
+    <div class="stat-row"><span>Total layers</span><span class="stat-val" id="st-layers">—</span></div>
+    <div class="stat-row"><span>Assets</span>      <span class="stat-val" id="st-assets">—</span></div>
+    <div class="stat-row"><span>FPS</span>          <span class="stat-val" id="st-fps">—</span></div>
+    <div class="stat-row"><span>Logo layers</span>  <span class="stat-val" id="st-logo">0</span></div>
+  </div>
+
+  <div class="cfg-sec">
+    <label class="cfg-lbl">Logo Layers</label>
+    <div class="logo-list" id="logo-list">
+      <div class="logo-empty">Click a layer in the tree<br>to mark it as the logo</div>
     </div>
   </div>
 
-  <!-- ── RIGHT: CONFIG ── -->
-  <div class="panel">
-    <div class="panel-header">Configuration</div>
-
-    <!-- Stats -->
-    <div class="config-section">
-      <div class="stat-row"><span>Layers</span><span class="stat-val" id="stat-layers">—</span></div>
-      <div class="stat-row"><span>Assets</span><span class="stat-val" id="stat-assets">—</span></div>
-      <div class="stat-row"><span>FPS</span><span class="stat-val" id="stat-fps">—</span></div>
-      <div class="stat-row"><span>Logo layers</span><span class="stat-val" id="stat-logo">0</span></div>
+  <div class="cfg-sec">
+    <label class="cfg-lbl">Primary Color <span class="cfg-sub">(user replaces this)</span></label>
+    <div class="color-row">
+      <div class="cprev" id="prev-p" style="background:#FF0000" onclick="document.getElementById('pick-p').click()"></div>
+      <input type="color" id="pick-p" value="#FF0000" oninput="pickColor('p',this.value)">
+      <input class="chex" id="hex-p"  value="#FF0000" maxlength="7" oninput="hexColor('p',this.value)" placeholder="#RRGGBB">
     </div>
-
-    <!-- Logo layers -->
-    <div class="config-section">
-      <label>Logo Layers Selected</label>
-      <div class="logo-list" id="logo-list">
-        <div class="logo-empty">Click layers in the tree<br>to mark as logo layers</div>
-      </div>
-    </div>
-
-    <!-- Primary color -->
-    <div class="config-section">
-      <label>Primary Color <span style="color:var(--txt3)">(will be replaced by user's choice)</span></label>
-      <div class="color-row">
-        <div class="color-preview" id="cprev-primary" style="background:#FF0000"
-             onclick="document.getElementById('cpick-primary').click()"></div>
-        <input type="color" id="cpick-primary" value="#FF0000" oninput="onColorPick('primary',this.value)">
-        <input class="color-hex" id="chex-primary" value="#FF0000" maxlength="7"
-               oninput="onColorHex('primary',this.value)" placeholder="#RRGGBB">
-      </div>
-      <div class="detected-colors" id="detected-primary"></div>
-    </div>
-
-    <!-- Secondary color -->
-    <div class="config-section">
-      <label>Secondary Color <span style="color:var(--txt3)">(will be replaced by user's choice)</span></label>
-      <div class="color-row">
-        <div class="color-preview" id="cprev-secondary" style="background:#FFFFFF"
-             onclick="document.getElementById('cpick-secondary').click()"></div>
-        <input type="color" id="cpick-secondary" value="#FFFFFF" oninput="onColorPick('secondary',this.value)">
-        <input class="color-hex" id="chex-secondary" value="#FFFFFF" maxlength="7"
-               oninput="onColorHex('secondary',this.value)" placeholder="#RRGGBB">
-      </div>
-      <div class="detected-colors" id="detected-secondary"></div>
-    </div>
-
-    <!-- Info -->
-    <div class="info-box">
-      <b>How to use:</b><br>
-      1. Load your Lottie JSON<br>
-      2. Click the layer that should be replaced with user's logo<br>
-      3. Set which colors to replace<br>
-      4. Export → send JSON to bot<br><br>
-      <b>Tip:</b> You can select multiple logo layers if needed.
-    </div>
-
-    <!-- Export -->
-    <div class="export-status" id="export-status"></div>
-    <button class="export-btn" id="export-btn" disabled onclick="exportConfig()">
-      📤 Export Config → Send to Bot
-    </button>
-
+    <div class="swatches" id="sw-p"></div>
   </div>
+
+  <div class="cfg-sec">
+    <label class="cfg-lbl">Secondary Color <span class="cfg-sub">(user replaces this)</span></label>
+    <div class="color-row">
+      <div class="cprev" id="prev-s" style="background:#FFFFFF" onclick="document.getElementById('pick-s').click()"></div>
+      <input type="color" id="pick-s" value="#FFFFFF" oninput="pickColor('s',this.value)">
+      <input class="chex" id="hex-s"  value="#FFFFFF" maxlength="7" oninput="hexColor('s',this.value)" placeholder="#RRGGBB">
+    </div>
+    <div class="swatches" id="sw-s"></div>
+  </div>
+
+  <div class="info">
+    <b>Steps:</b><br>
+    1. Load JSON from LottieLab export<br>
+    2. Click the logo/brand layer<br>
+    3. Click detected colors to assign<br>
+    4. Export → send JSON to bot<br><br>
+    <b>Tip:</b> Click "Logo Only" to confirm<br>you selected the right layer.
+  </div>
+
+  <div class="export-status" id="exp-status"></div>
+  <button class="export-btn" id="exp-btn" disabled onclick="doExport()">
+    📤 Export → Send to Bot
+  </button>
+</div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  STATE
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════
+let json       = null;
+let player     = null;
+let selected   = [];   // [{ref, name, ty}]
+let colors     = [];   // [{hex, count}]
+let primaryCol = '#FF0000';
+let secondCol  = '#FFFFFF';
+let mode       = 'full';
 
-let lottieData     = null;   // original parsed JSON
-let lottiePlayer   = null;   // lottie-web player instance
-let selectedLayers = [];     // array of { ref, name, ty }
-let detectedColors = [];     // [{hex, count}]
-let previewMode    = 'full';
-let primaryColor   = '#FF0000';
-let secondaryColor = '#FFFFFF';
-
-// ═══════════════════════════════════════════════════════════════════
-//  FILE LOADING
-// ═══════════════════════════════════════════════════════════════════
-
-function handleDrop(e) {
+// ═══════════════════════════════════════
+//  FILE LOAD
+// ═══════════════════════════════════════
+function onDrop(e) {
   e.preventDefault();
-  document.getElementById('upload-zone').classList.remove('drag');
-  const file = e.dataTransfer.files[0];
-  if (file) loadFile(file);
+  document.getElementById('drop-zone').classList.remove('drag');
+  loadFile(e.dataTransfer.files[0]);
 }
 
 function loadFile(file) {
-  if (!file || !file.name.endsWith('.json')) {
-    showToast('❌ Please upload a .json file');
-    return;
-  }
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith('.json')) { toast('❌ .json files only'); return; }
+
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = ev => {
     try {
-      const json = JSON.parse(e.target.result);
-      lottieData = json;
-      selectedLayers = [];
-      onJsonLoaded();
+      json     = JSON.parse(ev.target.result);
+      selected = [];
+      onLoaded();
     } catch (err) {
-      showToast('❌ Invalid JSON: ' + err.message);
+      toast('❌ Parse error: ' + err.message);
+      showError('JSON parse error: ' + err.message);
     }
   };
   reader.readAsText(file);
 }
 
-function onJsonLoaded() {
-  const json = lottieData;
-
+function onLoaded() {
   // Stats
-  document.getElementById('stat-layers').textContent = countAllLayers(json);
-  document.getElementById('stat-assets').textContent = json.assets?.length || 0;
-  document.getElementById('stat-fps').textContent    = json.fr || '—';
+  const layerCount = countLayers(json);
+  document.getElementById('st-layers').textContent = layerCount;
+  document.getElementById('st-assets').textContent = json.assets?.length || 0;
+  document.getElementById('st-fps').textContent    = json.fr || '—';
+
+  // Upload zone collapse
+  document.getElementById('drop-zone').innerHTML =
+    `<div class="icon">✅</div><p><strong>${escH(json.nm || 'Animation')} loaded</strong>${layerCount} layers · ${json.fr}fps · ${json.w}×${json.h}</p><p style="margin-top:4px;font-size:10px;color:var(--txt2)">Click to load another</p>`;
+  document.getElementById('drop-zone').onclick = () => document.getElementById('file-inp').click();
 
   // Build layer tree
-  buildLayerTree(json);
+  buildTree();
 
   // Detect colors
-  detectedColors = extractColors(json);
-  renderColorSwatches();
+  colors = detectColors(json);
+  renderSwatches();
 
   // Play animation
-  playAnimation(json);
+  play(json);
 
-  // Enable export check
-  updateExportBtn();
-
-  document.getElementById('preview-hint').textContent =
-    'Click a layer in the tree to mark it as a logo layer.';
-
-  showToast('✅ Loaded! Layers: ' + countAllLayers(json));
+  document.getElementById('hint').textContent = 'Click a layer to mark it as the logo layer.';
+  checkExport();
+  toast(`✅ Loaded! ${layerCount} layers · ${json.fr}fps`);
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  LOTTIE PREVIEW
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════
+//  PREVIEW
+// ═══════════════════════════════════════
+function play(animJson) {
+  const wrap = document.getElementById('lottie-wrap');
+  if (player) { try { player.destroy(); } catch{} }
+  wrap.innerHTML = '';
 
-function playAnimation(json, modifiedJson) {
-  const container = document.getElementById('lottie-preview');
-  if (lottiePlayer) { lottiePlayer.destroy(); }
-  container.innerHTML = '';
+  document.getElementById('loading-msg').textContent = '';
+  document.getElementById('error-msg').style.display = 'none';
 
-  const animData = modifiedJson || JSON.parse(JSON.stringify(json));
+  try {
+    // ✅ FIX: correct key is 'animationData' not 'animData'
+    player = lottie.loadAnimation({
+      container:     wrap,
+      renderer:      'svg',          // svg renderer more reliable than canvas
+      loop:          true,
+      autoplay:      true,
+      animationData: JSON.parse(JSON.stringify(animJson)), // must be a clone
+    });
 
-  lottiePlayer = lottie.loadAnimation({
-    container,
-    animData,
-    renderer: 'canvas',
-    loop: true,
-    autoplay: true,
-  });
-}
+    player.addEventListener('error', err => {
+      console.error('Lottie error:', err);
+      showError('Lottie render error.\nSee console for details.');
+    });
 
-function togglePreview(mode) {
-  previewMode = mode;
-  ['full','logo','colors'].forEach(m => {
-    document.getElementById('btn-'+m)?.classList.toggle('active', m === mode);
-  });
+    player.addEventListener('data_failed', () => {
+      showError('Animation data failed to load.');
+    });
 
-  if (!lottieData) return;
-  const json = JSON.parse(JSON.stringify(lottieData));
-
-  if (mode === 'logo' && selectedLayers.length) {
-    // Show ONLY logo layers, hide everything else
-    hideAllExcept(json, selectedLayers.map(l => l.ref));
-    playAnimation(null, json);
-  } else if (mode === 'colors') {
-    // Apply color replacements
-    replaceColorsInJson(json, primaryColor, secondaryColor);
-    playAnimation(null, json);
-  } else {
-    playAnimation(json);
+  } catch (err) {
+    console.error('Failed to load animation:', err);
+    showError('Failed to load: ' + err.message);
   }
 }
 
-function hideAllExcept(json, refs) {
-  // Set opacity 0 on all layers except selected
-  (json.layers || []).forEach((l, i) => {
-    const isLogoLayer = refs.some(r => r.type === 'root' && r.idx === i);
-    if (!isLogoLayer) l.ks = { ...l.ks, o: { a: 0, k: 0 } };
-    else l.ks = { ...l.ks, o: { a: 0, k: 100 } };
+function setMode(m) {
+  mode = m;
+  ['full','logo','colors'].forEach(k => {
+    document.getElementById('tb-' + k).classList.toggle('on', k === m);
   });
-  // Also handle assets
-  (json.assets || []).forEach((asset, ai) => {
-    (asset.layers || []).forEach((l, li) => {
-      const isLogoLayer = refs.some(r => r.type === 'asset' && String(r.assetId) === String(asset.id) && r.idx === li);
-      if (!isLogoLayer) l.ks = { ...l.ks, o: { a: 0, k: 0 } };
-      else l.ks = { ...l.ks, o: { a: 0, k: 100 } };
+
+  if (!json) return;
+  const clone = JSON.parse(JSON.stringify(json));
+
+  if (m === 'logo' && selected.length) {
+    isolateLayers(clone, selected.map(l => l.ref));
+    play(clone);
+  } else if (m === 'colors') {
+    applyColors(clone, primaryCol, secondCol);
+    play(clone);
+  } else {
+    play(clone);
+  }
+}
+
+function isolateLayers(j, refs) {
+  // Set opacity to 0 on all root layers except selected logo layers
+  (j.layers || []).forEach((l, i) => {
+    const isLogo = refs.some(r => r.type === 'root' && r.idx === i);
+    if (!isLogo) {
+      if (!l.ks) l.ks = {};
+      l.ks.o = { a:0, k:0 };
+    }
+  });
+  // Same for asset layers
+  (j.assets || []).forEach(asset => {
+    (asset.layers || []).forEach((l, i) => {
+      const isLogo = refs.some(r => r.type === 'asset' && String(r.assetId) === String(asset.id) && r.idx === i);
+      if (!isLogo) {
+        if (!l.ks) l.ks = {};
+        l.ks.o = { a:0, k:0 };
+      }
     });
   });
 }
 
-function replaceColorsInJson(json, primary, secondary) {
-  const pRgb = hexToRgb(primary), sRgb = hexToRgb(secondary);
-
-  function walkItem(item) {
+function applyColors(j, p, s) {
+  const pRgb = h2rgb(p), sRgb = h2rgb(s);
+  function walk(item) {
     if (!item || typeof item !== 'object') return;
     if ((item.ty === 'fl' || item.ty === 'st') && item.c?.k && typeof item.c.k[0] === 'number') {
-      const hex = rgbToHex(item.c.k);
-      if (hex === primaryColor.toUpperCase())   item.c.k = [...pRgb, 1];
-      if (hex === secondaryColor.toUpperCase()) item.c.k = [...sRgb, 1];
+      const h = rgb2hex(item.c.k);
+      if (h === primaryCol.toUpperCase()) item.c.k = [...pRgb, 1];
+      if (h === secondCol.toUpperCase())  item.c.k = [...sRgb, 1];
     }
-    ['it','shapes','layers'].forEach(k => { if (Array.isArray(item[k])) item[k].forEach(walkItem); });
+    if (item.ty === 't' && item.d?.k) {
+      item.d.k.forEach(kf => {
+        if (!kf.s) return;
+        if (kf.s.fc) { const h=rgb2hex(kf.s.fc); if(h===primaryCol.toUpperCase()) kf.s.fc=[...pRgb,1]; }
+      });
+    }
+    ['it','shapes','layers'].forEach(k => { if (Array.isArray(item[k])) item[k].forEach(walk); });
   }
-  (json.layers || []).forEach(walkItem);
-  (json.assets || []).forEach(a => (a.layers || []).forEach(walkItem));
+  (j.layers||[]).forEach(walk);
+  (j.assets||[]).forEach(a=>(a.layers||[]).forEach(walk));
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  LAYER TREE
-// ═══════════════════════════════════════════════════════════════════
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = '⚠️ ' + msg;
+  el.style.display = 'flex';
+}
 
-function buildLayerTree(json) {
+// ═══════════════════════════════════════
+//  LAYER TREE
+// ═══════════════════════════════════════
+function buildTree() {
   const tree = document.getElementById('layer-tree');
   tree.innerHTML = '';
 
-  // Root layers
-  const rootSection = document.createElement('div');
-  rootSection.style.cssText = 'padding: 8px 0;';
-  const rootLabel = document.createElement('div');
-  rootLabel.style.cssText = 'font-size:9px;color:var(--txt3);padding:4px 16px;letter-spacing:.1em;text-transform:uppercase;';
-  rootLabel.textContent = 'Root Layers';
-  rootSection.appendChild(rootLabel);
+  if (json.layers?.length) {
+    const sec = makeSec('Root Layers');
+    (json.layers).forEach((l, i) => sec.appendChild(makeNode(l, { type:'root', idx:i })));
+    tree.appendChild(sec);
+  }
 
-  (json.layers || []).forEach((layer, idx) => {
-    const node = buildLayerNode(layer, { type: 'root', idx }, json);
-    rootSection.appendChild(node);
-  });
-  tree.appendChild(rootSection);
-
-  // Assets
   if (json.assets?.length) {
-    const assetsSection = document.createElement('div');
-    assetsSection.style.cssText = 'padding: 8px 0; border-top: 1px solid var(--border);';
-    const aLabel = document.createElement('div');
-    aLabel.style.cssText = 'font-size:9px;color:var(--txt3);padding:4px 16px;letter-spacing:.1em;text-transform:uppercase;';
-    aLabel.textContent = 'Assets (Precomps)';
-    assetsSection.appendChild(aLabel);
-
-    json.assets.forEach((asset, ai) => {
-      const assetLabel = document.createElement('div');
-      assetLabel.style.cssText = 'font-size:9px;color:var(--txt2);padding:3px 16px;';
-      assetLabel.textContent = `📦 Asset ${asset.id}`;
-      assetsSection.appendChild(assetLabel);
-
-      (asset.layers || []).forEach((layer, li) => {
-        const node = buildLayerNode(layer, { type: 'asset', assetId: String(asset.id), idx: li }, json);
-        node.style.paddingLeft = '8px';
-        assetsSection.appendChild(node);
+    const sec = makeSec('Assets (Precomps)');
+    json.assets.forEach(asset => {
+      if (!asset.layers?.length) return;
+      const assetLbl = document.createElement('div');
+      assetLbl.style.cssText = 'font-size:9px;color:var(--txt2);padding:2px 14px 1px;';
+      assetLbl.textContent = `📦 ${asset.id}`;
+      sec.appendChild(assetLbl);
+      asset.layers.forEach((l, i) => {
+        const n = makeNode(l, { type:'asset', assetId:String(asset.id), idx:i });
+        n.style.paddingLeft = '8px';
+        sec.appendChild(n);
       });
     });
-    tree.appendChild(assetsSection);
+    tree.appendChild(sec);
   }
 }
 
-function buildLayerNode(layer, ref, json, depth = 0) {
-  const wrap = document.createElement('div');
-  wrap.className = 'layer-node';
+function makeSec(label) {
+  const sec = document.createElement('div');
+  const lbl = document.createElement('div');
+  lbl.className = 'tree-section-label';
+  lbl.textContent = label;
+  sec.appendChild(lbl);
+  return sec;
+}
 
-  const hasChildren = layer.layers?.length > 0;
-  const isSelected  = isLogoLayer(ref);
-  const rowId       = refToId(ref);
+function makeNode(layer, ref, depth = 0) {
+  const wrap = document.createElement('div');
+  const hasKids = layer.layers?.length > 0;
+  const id = ref2id(ref);
 
   const row = document.createElement('div');
-  row.className = 'layer-row' + (isSelected ? ' is-logo' : '');
-  row.id = 'row-' + rowId;
-  row.style.paddingLeft = (12 + depth * 14) + 'px';
+  row.className = 'layer-row' + (isSelected(ref) ? ' is-logo' : '');
+  row.id = 'r-' + id;
+  row.style.paddingLeft = (10 + depth * 14) + 'px';
 
-  // Toggle arrow
-  const toggle = document.createElement('span');
-  toggle.className = 'layer-toggle ' + (hasChildren ? '' : 'leaf');
-  toggle.textContent = hasChildren ? '▶' : '·';
-  row.appendChild(toggle);
+  // Arrow toggle (only visual — clicking row toggles selection AND expand)
+  const arrow = document.createElement('span');
+  arrow.className = 'l-arrow' + (hasKids ? '' : ' ');
+  arrow.textContent = hasKids ? '▶' : '·';
 
-  // Type icon
-  const typeIcon = document.createElement('span');
-  typeIcon.className = 'layer-type';
-  typeIcon.textContent = layerTypeIcon(layer.ty);
-  row.appendChild(typeIcon);
+  const typeEl = document.createElement('span');
+  typeEl.className = 'l-type';
+  typeEl.textContent = tyIcon(layer.ty);
 
-  // Name
   const nm = document.createElement('span');
-  nm.className = 'layer-nm' + (layer.nm ? '' : ' unnamed');
-  nm.textContent = layer.nm || `Layer ${layer.ind || '?'} (${layerTypeName(layer.ty)})`;
+  nm.className = 'l-nm' + (layer.nm ? '' : ' dim');
+  nm.textContent = layer.nm || `ind:${layer.ind ?? '?'} (${tyName(layer.ty)})`;
+
+  row.appendChild(arrow);
+  row.appendChild(typeEl);
   row.appendChild(nm);
 
-  // Logo badge
-  if (isSelected) {
-    const badge = document.createElement('span');
-    badge.className = 'layer-logo-badge';
-    badge.textContent = 'LOGO';
-    row.appendChild(badge);
+  if (isSelected(ref)) {
+    const b = document.createElement('span');
+    b.className = 'l-badge';
+    b.textContent = 'LOGO';
+    row.appendChild(b);
   }
-
-  // Click to select/deselect
-  row.onclick = e => {
-    e.stopPropagation();
-    if (hasChildren) {
-      toggle.classList.toggle('open');
-      const children = wrap.querySelector('.layer-children');
-      if (children) children.classList.toggle('open');
-    }
-    toggleLogoLayer(ref, layer, row);
-  };
-
-  wrap.appendChild(row);
 
   // Children
-  if (hasChildren) {
-    const children = document.createElement('div');
-    children.className = 'layer-children';
+  let childWrap = null;
+  if (hasKids) {
+    childWrap = document.createElement('div');
+    childWrap.className = 'l-children';
     layer.layers.forEach((child, ci) => {
       const childRef = ref.type === 'asset'
-        ? { type: 'asset', assetId: ref.assetId, idx: ci }
-        : { type: 'root', idx: ci };
-      children.appendChild(buildLayerNode(child, childRef, json, depth + 1));
+        ? { type:'asset', assetId:ref.assetId, idx:ci }
+        : { type:'root', idx:ci };
+      childWrap.appendChild(makeNode(child, childRef, depth + 1));
     });
-    wrap.appendChild(children);
+    wrap.appendChild(row);
+    wrap.appendChild(childWrap);
+  } else {
+    wrap.appendChild(row);
   }
+
+  // Click: expand/collapse children + toggle selection
+  row.addEventListener('click', e => {
+    e.stopPropagation();
+    if (hasKids) {
+      arrow.classList.toggle('open');
+      childWrap.classList.toggle('open');
+    }
+    toggleLayer(ref, layer, row);
+  });
 
   return wrap;
 }
 
-function toggleLogoLayer(ref, layer, row) {
-  const id  = refToId(ref);
-  const idx = selectedLayers.findIndex(l => refToId(l.ref) === id);
+function toggleLayer(ref, layer, row) {
+  const id  = ref2id(ref);
+  const idx = selected.findIndex(l => ref2id(l.ref) === id);
 
   if (idx > -1) {
-    selectedLayers.splice(idx, 1);
+    selected.splice(idx, 1);
     row.classList.remove('is-logo');
-    row.querySelector('.layer-logo-badge')?.remove();
+    row.querySelector('.l-badge')?.remove();
   } else {
-    selectedLayers.push({ ref, name: layer.nm || `Layer ${layer.ind}`, ty: layer.ty });
+    selected.push({ ref, name: layer.nm || `ind:${layer.ind}`, ty: layer.ty });
     row.classList.add('is-logo');
-    if (!row.querySelector('.layer-logo-badge')) {
-      const badge = document.createElement('span');
-      badge.className = 'layer-logo-badge';
-      badge.textContent = 'LOGO';
-      row.appendChild(badge);
+    if (!row.querySelector('.l-badge')) {
+      const b = document.createElement('span');
+      b.className = 'l-badge';
+      b.textContent = 'LOGO';
+      row.appendChild(b);
     }
   }
 
-  updateLogoList();
-  updateLogoBadgeRow();
-  updateExportBtn();
-  document.getElementById('stat-logo').textContent = selectedLayers.length;
+  document.getElementById('st-logo').textContent = selected.length;
+  refreshLogoList();
+  refreshBadges();
+  checkExport();
 
-  // Auto-switch to logo preview if 1 selected
-  if (selectedLayers.length === 1 && previewMode === 'full') {
-    togglePreview('logo');
-  } else if (selectedLayers.length === 0) {
-    togglePreview('full');
-  } else {
-    togglePreview(previewMode);
-  }
+  // Auto-preview logo only when one selected
+  if (selected.length >= 1) setMode('logo');
+  else setMode('full');
 }
 
-function isLogoLayer(ref) {
-  return selectedLayers.some(l => refToId(l.ref) === refToId(ref));
+function removeLayer(i) {
+  const removed = selected.splice(i, 1)[0];
+  const row = document.getElementById('r-' + ref2id(removed.ref));
+  if (row) { row.classList.remove('is-logo'); row.querySelector('.l-badge')?.remove(); }
+  document.getElementById('st-logo').textContent = selected.length;
+  refreshLogoList();
+  refreshBadges();
+  checkExport();
+  if (!selected.length) setMode('full');
+  else setMode(mode);
 }
 
-function refToId(ref) {
-  return ref.type === 'asset' ? `asset_${ref.assetId}_${ref.idx}` : `root_${ref.idx}`;
-}
-
-function updateLogoList() {
+function refreshLogoList() {
   const list = document.getElementById('logo-list');
-  if (!selectedLayers.length) {
-    list.innerHTML = '<div class="logo-empty">Click layers in the tree<br>to mark as logo layers</div>';
+  if (!selected.length) {
+    list.innerHTML = '<div class="logo-empty">Click a layer in the tree<br>to mark it as the logo</div>';
     return;
   }
-  list.innerHTML = selectedLayers.map((l, i) => `
-    <div class="logo-item">
-      <span>${layerTypeIcon(l.ty)}</span>
-      <span>${l.name || 'Layer'}</span>
-      <span class="remove-btn" onclick="removeLogoLayer(${i})">✕</span>
-    </div>
-  `).join('');
-}
-
-function removeLogoLayer(i) {
-  const removed = selectedLayers.splice(i, 1)[0];
-  const rowId   = 'row-' + refToId(removed.ref);
-  const row     = document.getElementById(rowId);
-  if (row) {
-    row.classList.remove('is-logo');
-    row.querySelector('.layer-logo-badge')?.remove();
-  }
-  updateLogoList();
-  updateLogoBadgeRow();
-  updateExportBtn();
-  document.getElementById('stat-logo').textContent = selectedLayers.length;
-  if (!selectedLayers.length) togglePreview('full');
-}
-
-function updateLogoBadgeRow() {
-  const row = document.getElementById('logo-badge-row');
-  row.innerHTML = selectedLayers.map(l =>
-    `<div class="logo-badge">${layerTypeIcon(l.ty)} ${l.name || 'Layer'}</div>`
+  list.innerHTML = selected.map((l, i) =>
+    `<div class="logo-item">
+      <span>${tyIcon(l.ty)}</span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(l.name)}</span>
+      <span class="logo-rm" onclick="removeLayer(${i})">✕</span>
+    </div>`
   ).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  COLORS
-// ═══════════════════════════════════════════════════════════════════
-
-function extractColors(json) {
-  const counts = new Map();
-
-  function scan(item) {
-    if (!item || typeof item !== 'object') return;
-    if ((item.ty === 'fl' || item.ty === 'st') && item.c?.k && typeof item.c.k[0] === 'number') {
-      const hex = rgbToHex(item.c.k);
-      counts.set(hex, (counts.get(hex) || 0) + 1);
-    }
-    if (item.ty === 't' && item.d?.k?.[0]?.s?.fc) {
-      const fc = item.d.k[0].s.fc;
-      const hex = rgbToHex(fc);
-      counts.set(hex, (counts.get(hex) || 0) + 1);
-    }
-    ['it','shapes','layers','items'].forEach(k => { if (Array.isArray(item[k])) item[k].forEach(scan); });
-  }
-  (json.layers || []).forEach(scan);
-  (json.assets || []).forEach(a => (a.layers || []).forEach(scan));
-
-  return [...counts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 12)
-    .map(([hex, count]) => ({ hex, count }));
+function refreshBadges() {
+  document.getElementById('sel-badges').innerHTML = selected.map(l =>
+    `<div class="sel-badge">${tyIcon(l.ty)} ${escH(l.name)}</div>`
+  ).join('');
 }
 
-function renderColorSwatches() {
-  ['primary','secondary'].forEach(role => {
-    const container = document.getElementById('detected-' + role);
-    container.innerHTML = detectedColors.map(({ hex, count }) => `
-      <div class="det-color" style="background:${hex}" title="${hex}"
-           onclick="setColor('${role}','${hex}')">
-        <div class="det-color-tip">${hex}<br>${count}×</div>
-      </div>
-    `).join('');
+function isSelected(ref) {
+  return selected.some(l => ref2id(l.ref) === ref2id(ref));
+}
+
+function ref2id(ref) {
+  return ref.type === 'asset' ? `a_${ref.assetId}_${ref.idx}` : `r_${ref.idx}`;
+}
+
+// ═══════════════════════════════════════
+//  COLORS
+// ═══════════════════════════════════════
+function detectColors(j) {
+  const map = new Map();
+  function walk(item) {
+    if (!item || typeof item !== 'object') return;
+    if ((item.ty==='fl'||item.ty==='st') && item.c?.k && typeof item.c.k[0]==='number') {
+      const h = rgb2hex(item.c.k);
+      map.set(h, (map.get(h)||0)+1);
+    }
+    if (item.ty==='t' && item.d?.k?.[0]?.s?.fc) {
+      const h = rgb2hex(item.d.k[0].s.fc);
+      map.set(h, (map.get(h)||0)+1);
+    }
+    ['it','shapes','layers'].forEach(k => { if (Array.isArray(item[k])) item[k].forEach(walk); });
+  }
+  (j.layers||[]).forEach(walk);
+  (j.assets||[]).forEach(a=>(a.layers||[]).forEach(walk));
+  return [...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10).map(([hex,count])=>({hex,count}));
+}
+
+function renderSwatches() {
+  ['p','s'].forEach(role => {
+    const container = document.getElementById('sw-' + role);
+    container.innerHTML = colors.map(({ hex, count }) => {
+      const safeHex = hex.replace('#','');
+      return `<div class="swatch" style="background:${hex}" data-hex="${hex}" data-role="${role}"
+                   onclick="setColor('${role}','${hex}')">
+        <div class="swatch-tip">${hex} (${count}×)</div>
+      </div>`;
+    }).join('');
   });
 
-  // Auto-set primary/secondary to most common colors
-  if (detectedColors.length >= 1) setColor('primary',   detectedColors[0].hex);
-  if (detectedColors.length >= 2) setColor('secondary', detectedColors[1].hex);
+  // Auto-assign top 2 colors
+  if (colors[0]) setColor('p', colors[0].hex);
+  if (colors[1]) setColor('s', colors[1].hex);
+  else if (colors[0]) setColor('s', colors[0].hex === '#FFFFFF' ? '#000000' : '#FFFFFF');
+  refreshSwatchHighlight();
 }
 
 function setColor(role, hex) {
-  if (role === 'primary')   primaryColor   = hex.toUpperCase();
-  if (role === 'secondary') secondaryColor = hex.toUpperCase();
+  hex = hex.toUpperCase();
+  if (role === 'p') { primaryCol = hex; }
+  else              { secondCol  = hex; }
 
-  document.getElementById('cprev-' + role).style.background = hex;
-  document.getElementById('cpick-' + role).value = hex;
-  document.getElementById('chex-' + role).value  = hex.toUpperCase();
+  document.getElementById('prev-' + role).style.background = hex;
+  document.getElementById('pick-' + role).value = hex;
+  document.getElementById('hex-'  + role).value = hex;
 
-  // Update swatch highlights
-  ['primary','secondary'].forEach(r => {
-    document.querySelectorAll(`#detected-${r} .det-color`).forEach(el => {
-      el.classList.remove('set-primary','set-secondary');
-      if (el.style.background.toUpperCase() === primaryColor ||
-          el.title.toUpperCase() === primaryColor) el.classList.add('set-primary');
-      if (el.style.background.toUpperCase() === secondaryColor ||
-          el.title.toUpperCase() === secondaryColor) el.classList.add('set-secondary');
-    });
+  refreshSwatchHighlight();
+  if (mode === 'colors') setMode('colors');
+}
+
+function refreshSwatchHighlight() {
+  document.querySelectorAll('.swatch').forEach(el => {
+    el.classList.remove('as-primary','as-secondary');
+    const h = el.dataset.hex;
+    if (h === primaryCol) el.classList.add('as-primary');
+    if (h === secondCol)  el.classList.add('as-secondary');
   });
-
-  if (previewMode === 'colors') togglePreview('colors');
 }
 
-function onColorPick(role, hex) {
-  setColor(role, hex);
-  document.getElementById('chex-' + role).value = hex.toUpperCase();
-}
+function pickColor(role, hex) { setColor(role, hex); document.getElementById('hex-'+role).value = hex.toUpperCase(); }
+function hexColor(role, val)  { if (/^#[0-9A-Fa-f]{6}$/.test(val)) setColor(role, val); }
 
-function onColorHex(role, val) {
-  if (/^#[0-9A-Fa-f]{6}$/.test(val)) setColor(role, val);
-}
-
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  EXPORT
-// ═══════════════════════════════════════════════════════════════════
-
-function updateExportBtn() {
-  const btn = document.getElementById('export-btn');
-  const ok  = lottieData && selectedLayers.length > 0;
-  btn.disabled = !ok;
+// ═══════════════════════════════════════
+function checkExport() {
+  document.getElementById('exp-btn').disabled = !(json && selected.length > 0);
 }
 
-function exportConfig() {
-  if (!lottieData || !selectedLayers.length) return;
+function doExport() {
+  if (!json || !selected.length) return;
 
-  // Build the config-enriched JSON
-  const output = JSON.parse(JSON.stringify(lottieData));
+  // Create a clean export (remove _magic_bot if already exists)
+  const out = JSON.parse(JSON.stringify(json));
+  delete out._magic_bot;
 
-  // Embed config in a special field that bot reads
-  output._magic_bot = {
-    version:        2,
-    logo_layers:    selectedLayers.map(l => l.ref),
-    primary_color:  primaryColor,
-    secondary_color: secondaryColor,
-    exported_at:    new Date().toISOString(),
+  // Embed config
+  out._magic_bot = {
+    version:         2,
+    logo_layers:     selected.map(l => ({ ref: l.ref, name: l.name })),
+    primary_color:   primaryCol,
+    secondary_color: secondCol,
+    exported_at:     new Date().toISOString(),
   };
 
-  const blob     = new Blob([JSON.stringify(output)], { type: 'application/json' });
-  const url      = URL.createObjectURL(blob);
-  const a        = document.createElement('a');
-  a.href         = url;
-  a.download     = 'design_config.json';
+  const blob = new Blob([JSON.stringify(out)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'design_config.json';
   a.click();
   URL.revokeObjectURL(url);
 
-  document.getElementById('export-status').textContent =
-    '✅ Saved! Send design_config.json to your bot.';
-
-  showToast('📤 Exported! Send design_config.json to your bot');
+  document.getElementById('exp-status').textContent = '✅ Saved! Send design_config.json to bot.';
+  toast('📤 Exported! Send design_config.json to your bot');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  UTILITIES
-// ═══════════════════════════════════════════════════════════════════
-
-function layerTypeIcon(ty) {
-  return { 0:'📦', 1:'■', 2:'🖼', 3:'◎', 4:'✦', 5:'T' }[ty] || '?';
-}
-function layerTypeName(ty) {
-  return { 0:'precomp', 1:'solid', 2:'image', 3:'null', 4:'shape', 5:'text' }[ty] || 'unknown';
-}
-
-function countAllLayers(json) {
-  let n = (json.layers || []).length;
-  (json.assets || []).forEach(a => { n += (a.layers || []).length; });
-  return n;
-}
-
-function rgbToHex(arr) {
-  const r = Math.round((arr[0] || 0) * 255);
-  const g = Math.round((arr[1] || 0) * 255);
-  const b = Math.round((arr[2] || 0) * 255);
-  return ('#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('')).toUpperCase();
-}
-function hexToRgb(hex) {
-  hex = hex.replace('#','');
-  return [parseInt(hex.slice(0,2),16)/255, parseInt(hex.slice(2,4),16)/255, parseInt(hex.slice(4,6),16)/255];
-}
-
-function showToast(msg, dur = 3000) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._t);
-  t._t = setTimeout(() => t.classList.remove('show'), dur);
+// ═══════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════
+function tyIcon(ty) { return {0:'📦',1:'■',2:'🖼',3:'◎',4:'✦',5:'T'}[ty]??'?'; }
+function tyName(ty) { return {0:'precomp',1:'solid',2:'image',3:'null',4:'shape',5:'text'}[ty]??'?'; }
+function countLayers(j) { let n=(j.layers||[]).length; (j.assets||[]).forEach(a=>{n+=(a.layers||[]).length;}); return n; }
+function rgb2hex(arr) { return('#'+[arr[0],arr[1],arr[2]].map(v=>Math.round((v||0)*255).toString(16).padStart(2,'0')).join('')).toUpperCase(); }
+function h2rgb(hex)   { hex=hex.replace('#',''); return[parseInt(hex.slice(0,2),16)/255,parseInt(hex.slice(2,4),16)/255,parseInt(hex.slice(4,6),16)/255]; }
+function escH(s)      { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toast(msg, d=3000) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),d);
 }
 </script>
 </body>
